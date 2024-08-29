@@ -3,7 +3,7 @@ from haystack.nodes import FARMReader, TransformersReader, DensePassageRetriever
 from haystack.pipelines import ExtractiveQAPipeline
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.schema import Document
-from transformers import DPRQuestionEncoder, DRPContextEncoder
+from transformers import DPRQuestionEncoder, DPRContextEncoder
 
 # Configuración de Streamlit
 st.title("Chatbot con Haystack basado en tu documento")
