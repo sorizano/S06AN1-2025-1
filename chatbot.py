@@ -1,37 +1,29 @@
 import streamlit as st
-from haystack.nodes import FARMReader, TransformersReader, DensePassageRetriever
+from haystack.nodes import FARMReader, DensePassageRetriever
 from haystack.pipelines import ExtractiveQAPipeline
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.schema import Document
-from transformers import DPRQuestionEncoder, DPRContextEncoder
 
-# Configuración de Streamlit
-st.title("Chatbot con Haystack basado en tu documento")
-
-# Cargar los modelos de prueba
-question_encoder = DPRQuestionEncoder.from_pretrained("facebook/dpr-question_encoder-single-nq-base")
-context_encoder = DPRContextEncoder.from_pretrained("facebook/dpr-ctx_encoder-single-nq-base")
-print("Modelos cargados exitosamente")
+# Título de la aplicación
+st.title("Chatbot basado en tu documento con Haystack")
 
 # Subida del archivo
 uploaded_file = st.file_uploader("Sube un documento de texto", type="txt")
 
 if uploaded_file is not None:
-    # Leer el contenido del archivo subido
+    # Leer y mostrar el contenido del archivo
     document_text = uploaded_file.read().decode("utf-8")
-
-    # Mostrar el contenido del documento
     st.write("Contenido del documento:")
     st.text(document_text)
 
-    # Configurar Haystack
+    # Configuración del Document Store
     document_store = InMemoryDocumentStore()
 
-    # Convertir el texto en un formato compatible para Haystack usando la clase Document
+    # Crear el documento y guardarlo en el Document Store
     docs = [Document(content=document_text, meta={"name": "uploaded_document.txt"})]
     document_store.write_documents(docs)
 
-    # Inicializar el modelo retriever y reader
+    # Configuración del Retriever y del Reader
     retriever = DensePassageRetriever(
         document_store=document_store, 
         query_embedding_model="facebook/dpr-question_encoder-single-nq-base",
@@ -42,7 +34,7 @@ if uploaded_file is not None:
 
     reader = FARMReader(model_name_or_path="deepset/roberta-base-squad2", use_gpu=False)
 
-    # Pipeline de QA
+    # Crear el pipeline de preguntas y respuestas
     pipe = ExtractiveQAPipeline(reader, retriever)
 
     # Entrada de la pregunta del usuario
@@ -52,10 +44,10 @@ if uploaded_file is not None:
         if question:
             # Obtener la respuesta
             prediction = pipe.run(query=question, params={"Retriever": {"top_k": 10}, "Reader": {"top_k": 5}})
-            
+
             # Mostrar la respuesta
             st.write("Respuesta del Chatbot:")
-            if len(prediction['answers']) > 0:
+            if prediction['answers']:
                 st.write(prediction['answers'][0].answer)
             else:
                 st.write("No se encontró una respuesta adecuada en el documento.")
