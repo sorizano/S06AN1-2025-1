@@ -1,9 +1,8 @@
 import streamlit as st
-from haystack.nodes import FARMReader, TransformersReader
+from haystack.nodes import FARMReader, TransformersReader, DensePassageRetriever
 from haystack.pipelines import ExtractiveQAPipeline
 from haystack.document_stores import InMemoryDocumentStore
-from haystack.nodes import DensePassageRetriever
-from haystack.schema import Document  # Asegúrate de importar la clase Document
+from haystack.schema import Document
 
 # Configuración de Streamlit
 st.title("Chatbot con Haystack basado en tu documento")
@@ -27,7 +26,14 @@ if uploaded_file is not None:
     document_store.write_documents(docs)
 
     # Inicializar el modelo retriever y reader
-    retriever = DensePassageRetriever(document_store=document_store, embedding_model="facebook/dpr-ctx_encoder-single-nq-base")
+    retriever = DensePassageRetriever(
+        document_store=document_store, 
+        query_embedding_model="facebook/dpr-question_encoder-single-nq-base",
+        passage_embedding_model="facebook/dpr-ctx_encoder-single-nq-base",
+        use_gpu=False
+    )
+    document_store.update_embeddings(retriever)
+
     reader = FARMReader(model_name_or_path="deepset/roberta-base-squad2", use_gpu=False)
 
     # Pipeline de QA
