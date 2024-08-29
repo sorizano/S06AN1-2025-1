@@ -43,7 +43,7 @@ if uploaded_file is not None:
 
             #mostrar la respuesta
             st.write("Respuesta del Chatbot:")
-            if len(prediction['answers'])>0;
+            if len(prediction['answers'])>0:
                 st.write(prediction['answers'][0].answer)
             else:
                 st.write("No se encontró una respuesta adecuada en el documento")
