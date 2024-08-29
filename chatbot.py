@@ -3,9 +3,15 @@ from haystack.nodes import FARMReader, TransformersReader, DensePassageRetriever
 from haystack.pipelines import ExtractiveQAPipeline
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.schema import Document
+from trasformers import DPRQuestionEncoder, DRPContextEncoder
 
 # Configuración de Streamlit
 st.title("Chatbot con Haystack basado en tu documento")
+
+# Cargar los modelos de prueba
+question_encoder = DPRQuestionEncoder.from_pretrained("facebook/dpr-question_encoder-single-nq-base")
+context_encoder = DPRContextEncoder.from_pretrained("facebook/dpr-ctx_encoder-single-nq-base")
+print("Modelos cargados exitosamente")
 
 # Subida del archivo
 uploaded_file = st.file_uploader("Sube un documento de texto", type="txt")
