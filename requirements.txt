@@ -1,4 +1,4 @@
-torch==1.10.0+cpu
-farm-haystack==1.14.0
-transformers==4.11.3
+torch
+transformers
+farm-haystack
 streamlit
